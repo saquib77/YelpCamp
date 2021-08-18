@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const app = express();
 const path = require('path');
 const ejsMate = require('ejs-mate');
+const fileUpload = require('express-fileupload');
 const methodOverride = require('method-override');
 const Campground = require("./models/campground");
 
@@ -17,9 +18,12 @@ db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
     console.log("Database Connected");
 });
+
+app.use(fileUpload());
 app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
@@ -40,7 +44,7 @@ app.post('/campgrounds', async (req, res) => {
     const campground = new Campground(req.body.campground);
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`)
-})
+});
 
 app.get('/campgrounds/:id', async (req, res,) => {
     const campground = await Campground.findById(req.params.id)
